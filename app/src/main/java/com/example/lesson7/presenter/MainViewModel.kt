@@ -4,24 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lesson7.data.DogsService
+import com.example.lesson7.domain.GetDogsUseCase
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
+import javax.inject.Inject
 
-class MainViewModel: ViewModel() {
-    private val service by lazy {
-        createDogService()
-    }
+class MainViewModel @Inject constructor(
+    private val getDogsUseCase: GetDogsUseCase
+): ViewModel() {
     private val _dogImageUrl =MutableLiveData<String>()
     val dogImageUrl:LiveData<String>
         get() = _dogImageUrl
 
     fun loadNewDog() {
         viewModelScope.launch {
-            val response = service.loadDogInfo()
-            val dogInfo = response.body()
+            val dogInfo = getDogsUseCase()
 
             _dogImageUrl.postValue(
                 dogInfo?.url
@@ -34,11 +30,6 @@ class MainViewModel: ViewModel() {
         )
     }
 
-    private fun createDogService(): DogsService =
-        Retrofit.Builder()
-            .baseUrl("https://random.dog/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create()
+
 
 }

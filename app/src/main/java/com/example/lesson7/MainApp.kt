@@ -10,7 +10,9 @@ class MainApp: Application() {
         private set
 
     override fun onCreate() {
-        appComponent = DaggerAppComponent.create()
+        appComponent = DaggerAppComponent.builder()
+            .application(this)
+            .build()
 
         super.onCreate()
     }

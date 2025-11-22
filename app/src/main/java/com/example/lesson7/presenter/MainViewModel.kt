@@ -4,32 +4,38 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.lesson7.domain.GetDogsUseCase
+import com.example.lesson7.data.model.TaskEntity
+import com.example.lesson7.data.model.TaskStates
+import com.example.lesson7.domain.GetTaskUseCase
+import com.example.lesson7.domain.UpdateTaskStateUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
-    private val getDogsUseCase: GetDogsUseCase
+    private val getTaskUseCase: GetTaskUseCase,
+    private val updateTaskStateUseCase: UpdateTaskStateUseCase,
 ): ViewModel() {
-    private val _dogImageUrl =MutableLiveData<String>()
-    val dogImageUrl:LiveData<String>
-        get() = _dogImageUrl
 
-    fun loadNewDog() {
+    private val _tasks = MutableLiveData<List<TaskEntity>> ()
+    val tasks: LiveData<List<TaskEntity>>
+        get() = _tasks
+
+    init {
         viewModelScope.launch {
-            val dogInfo = getDogsUseCase()
+            getTaskUseCase().collect{
+                _tasks.postValue(it)
+            }
 
-            _dogImageUrl.postValue(
-                dogInfo?.url
-            )
         }
-
-
-        _dogImageUrl.postValue(
-            "https://random.dog/2b9be14d-f084-4cbc-a266-35cc02ff62e9.gif"
-        )
     }
 
-
+    fun changeTaskState(task: TaskEntity, taskStates: TaskStates) {
+        viewModelScope.launch {
+            updateTaskStateUseCase(
+                task=task,
+                taskStates=taskStates,
+            )
+        }
+    }
 
 }

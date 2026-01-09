@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.lesson7.data.model.TaskEntity
 import com.example.lesson7.data.model.TaskStates
 import com.example.lesson7.domain.CreateTaskUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +21,7 @@ class CreateVieModel @Inject constructor(
         title: String?,
         description: String?
     ) {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             createTaskUseCase(
                 TaskEntity(
                     title = title!!,

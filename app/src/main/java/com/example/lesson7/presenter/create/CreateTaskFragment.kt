@@ -1,11 +1,12 @@
 package com.example.lesson7.presenter.create
 
 import android.content.Context
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.example.lesson7.R
 import com.example.lesson7.appComponent
@@ -13,6 +14,8 @@ import com.example.lesson7.databinding.FragmentCreateTaskBinding
 import com.example.lesson7.di.viewModel.ViewModeFactory
 import com.google.android.material.datepicker.MaterialDatePicker
 import dev.androidbroadcast.vbpd.viewBinding
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 class CreateTaskFragment: Fragment(R.layout.fragment_create_task) {
@@ -45,6 +48,17 @@ class CreateTaskFragment: Fragment(R.layout.fragment_create_task) {
         }
 
         datePangeiker.addOnPositiveButtonClickListener {
+            val startDate = it.first
+            val endDate = it.second
+
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            val formattedStart = dateFormat.format(Date(startDate))
+            val formattedEnd = dateFormat.format(Date(endDate))
+
+            // текст в поле
+            val dateIntervalText = "$formattedStart - $formattedEnd"
+            binding.newTaskDateInterval.editText?.setText(dateIntervalText)
+
             viewModel.saveDates(
                 start = it.first,
                 end = it.second,
@@ -56,6 +70,11 @@ class CreateTaskFragment: Fragment(R.layout.fragment_create_task) {
                 title = binding.newTaskTitle.editText?.text.toString(),
                 description = binding.newTaskDescription.editText?.text.toString()
             )
+            Toast.makeText(
+                requireContext(),
+                "Задача создана!",
+                Toast.LENGTH_LONG
+            ).show()
             true
         }
     }
